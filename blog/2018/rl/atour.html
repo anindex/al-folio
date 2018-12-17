@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>Your Name | a post with math</title>
+  <meta name="description" content="A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+">
+
+  <link rel="shortcut icon" href="/anindex.github.io/assets/img/favicon.ico">
+
+  <link rel="stylesheet" href="/anindex.github.io/assets/css/main.css">
+  <link rel="canonical" href="/anindex.github.io/blog/2015/math/">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+
+    <span class="site-title">
+
+        <strong>Your</strong> Name
+    </span>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+      <div class="trigger">
+        <!-- About -->
+        <a class="page-link" href="/anindex.github.io/">about</a>
+
+        <!-- Blog -->
+        <a class="page-link" href="/anindex.github.io/blog/">blog</a>
+
+        <!-- Pages -->
+
+
+
+
+
+
+
+
+            <a class="page-link" href="/anindex.github.io/projects/">projects</a>
+
+
+
+            <a class="page-link" href="/anindex.github.io/publications/">publications</a>
+
+
+
+            <a class="page-link" href="/anindex.github.io/teaching/">teaching</a>
+
+
+
+
+
+
+
+        <!-- CV link -->
+        <a class="page-link" href="/anindex.github.io/assets/pdf/CV.pdf">vitae</a>
+
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">a post with math</h1>
+    <p class="post-meta">October 20, 2015</p>
+  </header>
+
+  <article class="post-content">
+    <h3> Introduction </h3>
+<p> This document summarizes what I have learnt about the intersection of Control Theory and Reinforcement Learning (RL) topic. The topic was greatly introduced by Ben Recht, which he proposed this new exciting field the name <strong>Actionable Intelligence</strong>.
+To begin, this is the introductory headline of the field: </p>
+
+ <q> Actionable Intelligence is the study of  how to use past data to enhance the future manipulation of a dynamical system </q>
+
+<p> I know some Computer Science guys at my Uni said that Deep RL is the key to achieve The Singularity (lol), and yes there are strong supports that RL has defeated human in Go, Atari game, etc. To be honest, I doubted about that audacious blame. At that time, I thought that Deep RL achieved these performances in perfect environment without measurement error and no hidden game states, but how can we so sure that it will achieve the same in dynamic and imperfect environment of industrial systems?
+
+The tour of Ben Recht indeed clears my doubts, there is a whole pool of problems to solve. Why is it so hard to optimal control a system given unknown dynamic states? RL has to be the one that could easily solve this kind of problem. The answer is simple, the stakes could not be higher if we would like to guarantee safety executions and valuable gains (both are defined by reward function) by a series of action in uncertainty. Afterall, RL is to find (randomly or heuristic) a series of action <strong>u</strong> to maximize reward function <strong>r</strong>. </p>
+
+<h3> A test-bed for everyone to test: Linear Quadratic Regulator (LQR) </h3>
+
+<p> As Prof. Recht stated his point: </p>
+
+<q> If a machine learning does crazy things when restricted to linear models, it's going to do crazy things on complex nonlinear models too. </q>
+
+<p> And reversely, if your ML algorithm has good results on non-linear models, it has to be get acceptable results on linear models too. Otherwise, it is unreasonable to trust your model. Therefore, LQR has come to save the day as a test-bed for everything new popped out of your head.
+
+LQR is a special case of optimal control problem when we know the state transitions function and we design the cost function to represent our task: </p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ minE_e[\sum_{t=1}^{T}C_t(x_t,u_t) $$</code>
+</p>
+<p align="center">
+  <code class="highlighter-rouge">$$ x_{t+1}=f_t(x_t,u_t,e_t) $$</code>
+</p>
+<p align="center">
+  <code class="highlighter-rouge">$$ u_t=\pi_t(\tau_t) $$</code>
+</p>
+
+With LQR (continuous version), the state transition function is linear and the cost becomes quadratic:
+
+<p align="center">
+  <code class="highlighter-rouge">$$ E[\frac{1}{T}\sum_{t=1}^{T}x_t^TQx_t+u_t^TRu_t+x_T^TP_Tx_T] $$</code>
+</p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ x_{t+1}=Ax_t+Bu_t+e_t $$</code>
+</p>
+
+<p>Intuitively, you must find a series of action <code class="highlighter-rouge">$$ u_t $$</code> in order to minimize the quadratic cost expected over error (to get mean error). Next section will introduce some approaches to find the optimal (or not) policy and how fast they converge to minimum cost with a fixed amount of samples. The raising question is how we can balance between optimal cost and computation to process as least as possible many samples.
+
+I have not implemented any approaches in RL to try to solve LQR yet, but it seems pretty straightforward to implement. However, Prof. Recht mentioned LQR is not easy, "magic tends to happen in LQR". I do not know if this is true until I get my hand dirty on evaluating these approaches. </p>
+
+<h3> Approaches to solve LQR with RL </h3>
+
+<p> In the above LQR problem, we design the cost function based on our demands and if we fully know the state transitions functions, we can solve LQR directly using Batch Optimization or Dynamic Programming. And the solution is described as below.
+
+For finite-time horizon, discrete-time LQR: </p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ u_t=-K_tx_t $$</code>
+</p>
+
+where
+
+<p align="center">
+  <code class="highlighter-rouge">$$ K_t=-(B^TP_{t+1}B+R)^{-1}B^TP_{t+1}A $$</code>
+</p>
+
+and
+
+<p align="center">
+  <code class="highlighter-rouge">$$ P_t=Q+A^TP_{t+1}A-A^TP_{t+1}B(R+B^TP_{t+1}B)^{-1}B^TP_{t+1}A $$</code>
+</p>
+
+<p>When we know the state transition, we know A and B in linear equation. The optimal solution is founded by recursively find ![alt text](https://latex.codecogs.com/gif.latex?P_{t+1}) from terminal condition ![alt text](https://latex.codecogs.com/gif.latex?P_T). Then we can find series ![alt text](https://latex.codecogs.com/gif.latex?u_t).
+
+When the time T approaches infinity, the optimal solution of <strong>u</strong> becomes static. Solving Riccati equation of P, we get: </p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ P=Q+A^TPA-A^TPB(R+B^TPB)^{-1}B^TPA $$</code>
+</p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ K=-(B^TPB+R)^{-1}B^TPA$$</code>
+</p>
+
+<p> As we can see, the optimal solution <strong>u</strong> is independence of error variance, which means more noise do not affect system control. In infinite-time scheme, solution **u** is time-invariant.
+
+The questions is, when we do not know state transition function, we do not know A, B in advanced, how can we solve LQR for optimal control? This is the place that RL shined.
+
+We have these roads to follow: </p>
+
+<ol>
+  <li>Identify everything (the most masochistic way lol) about system dynamic using physics and finite element methods.</li>
+  <li>Identify a coarse model for the system dynamic</li>
+  <li>We will be blunt :) and map directly data from sensor models to output control (e.g neural network)</li>
+</ol>
+
+<h3> Model-based approaches </h3>
+
+<p> I am personally like the first approach, because that's what Control Theory guys usually do anyway :). They called this approach System Identification. However, in ML manner, we do not use the glory of Physics to model the system. What we are going to do is trying to learn the state-transition function, which means we will fit the matrix A and B with some cost function by choices. For example, we use L2 loss to fit A, B: </p>
+
+<p align="center">
+  <code class="highlighter-rouge">$$ \hat{A},\hat{B}=\underset{A,B}{min}\sum_{t=1}^{T-1}||x_{t+1}-Ax_t-Bu_t||^2$$</code>
+</p>
+
+Then we plug these matrices to state transition function with an error ![alt text](https://latex.codecogs.com/gif.latex?v_t):
+
+<p align="center">
+  <code class="highlighter-rouge">$$ x_{t+1}=\hat{A}x_t+\hat{B}u_t+v_t $$</code>
+</p>
+
+<p> Actually, if we treat <code class="highlighter-rouge">$$ \hat{A}, \hat{B} $$</code> as true dynamic matrices, it does not feel right. So far, this approach finds solution <strong>u</strong> based on what we just estimated <code class="highlighter-rouge">$$ \hat{A}, \hat{B} $$</code>. Here is the burning question: How can we model the uncertainty (errors) of our estimation and then use that to design solution <strong>u</strong> to robust control the system?
+
+<p> To answer that question, there are recent works of (again) Prof.Recht's group about Coarsed-ID control addressing this problem. These works will be discussed in next posts. </p>
+
+<h3>Model-free approaches</h3>
+
+<p> This section is huge! I cannot write the section down with few lines, it is even fit to have many intensive courses in RL. And yes, this is the realm of RL, everyone like it :). This section serves as introductory point for the next few posts. Basically, as the name stated, we do not care about the system dynamic, what we do is to mitigate cost function by: </p>
+
+<ul>
+  <li>Iteratively refining cost function based on measured system state and estimating policy ![alt text](https://latex.codecogs.com/gif.latex?u_t) from the cost function each time step: **Approximate Dynamic Programming**.</li>
+  <li>Defining a parametrized distribution <code class="highlighter-rouge">$$ p(u;\vartheta) $$</code> over <code class="highlighter-rouge">$$ u_t $$</code> and use gradient ascent for some average reward function of <code class="highlighter-rouge">$$ u_t $$</code> to refine iteratively the parametrized distribution <code class="highlighter-rouge">$$ p(u;\vartheta) $$</code>. The purpose is to minimize cost function expected over that distribution: **Direct Policy Search**.</li>
+</ul>
+
+<p> For now, we do not go to detail of these methods. PID is also a model-free method that find <strong>u</strong> based on just the error, but PID can learn to compensate for poor models, changing conditions? This leads us to a burning topic from PID to RL: </p>
+
+<q> How well must we understand the system in order to optimal control it? </q>
+
+<p> The next few posts we will discuss how we balance between optimal policy solution versus computation cost to process the system state samples and how fast these methods find solution that leads system to stability. </p>
+
+
+  </article>
+
+
+
+</div>
+
+      </div>
+    </div>
+
+    <footer>
+
+  <div class="wrapper">
+    &copy; Copyright 2018 an T. Le.
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
+
+
+  </div>
+
+</footer>
+
+
+    <!-- Load jQuery -->
+<script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<!-- Load Common JS -->
+<script src="/anindex.github.io/assets/js/common.js"></script>
+
+
+<!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+<script src="/anindex.github.io/assets/js/katex.js"></script>
+
+
+
+
+<!-- Include custom icon fonts -->
+<link rel="stylesheet" href="/anindex.github.io/assets/css/fontawesome-all.min.css">
+<link rel="stylesheet" href="/anindex.github.io/assets/css/academicons.min.css">
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-XXXXXXXXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+
+</html>

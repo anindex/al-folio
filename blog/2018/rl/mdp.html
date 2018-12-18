@@ -6,14 +6,23 @@
   <meta name="viewport" content="width=device-width initial-scale=1" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>Your Name | a post with math</title>
+  <title>Le Thai An | Markov Decision Process</title>
   <meta name="description" content="A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 ">
 
   <link rel="shortcut icon" href="/anindex.github.io/assets/img/favicon.ico">
 
   <link rel="stylesheet" href="/anindex.github.io/assets/css/main.css">
-  <link rel="canonical" href="/anindex.github.io/blog/2015/math/">
+  <link rel="canonical" href="/anindex.github.io/blog/2018/rl/">
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+  </script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 </head>
 
 
@@ -26,7 +35,7 @@
 
     <span class="site-title">
 
-        <strong>Your</strong> Name
+        <strong>Le</strong> Thai An
     </span>
 
 
@@ -66,14 +75,6 @@
 
 
 
-            <a class="page-link" href="/anindex.github.io/teaching/">teaching</a>
-
-
-
-
-
-
-
         <!-- CV link -->
         <a class="page-link" href="/anindex.github.io/assets/pdf/CV.pdf">vitae</a>
 
@@ -91,18 +92,173 @@
         <div class="post">
 
   <header class="post-header">
-    <h1 class="post-title">a post with math</h1>
-    <p class="post-meta">October 20, 2015</p>
+    <h1 class="post-title">Markov Decision Process</h1>
+    <p class="post-meta">December 08, 2018</p>
   </header>
 
   <article class="post-content">
-    <p>This theme supports rendering beautiful math in inline and display modes using <a href="https://khan.github.io/KaTeX/">KaTeX</a> engine. You just need to surround your math expression with <code class="highlighter-rouge">$$</code>, like <code class="highlighter-rouge">$$ E = mc^2 $$</code>. If you leave it inside a paragraph, it will produce an inline expression, just like <script type="math/tex">E = mc^2</script>.</p>
+    <h3> Overview of RL </h3>
+<p> RL has many applications in different fields ranging from Optimal Control, Reward System, Operations Research (Economics), etc. It is indeed a huge distinct branch
+in Machine Learning beside Supervised and Unsupervised Learning. There are important aspects in the formulation of RL: </p>
 
-<p>To use display mode, again surround your expression with <code class="highlighter-rouge">$$</code> and place it as a separate paragraph. Here is an example:</p>
+<ul>
+  <li>No supervisor, only reward signal serves as heuristic guidance.</li>
+  <li>RL is stochastic, so feedback is not instantaneous.</li>
+  <li>The variables are sequential time-dependent.</li>
+  <li>Action affects subsequent observable data.</li>
+</ul>
 
-<script type="math/tex; mode=display">\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)</script>
+<p> Using RL, we try to build an agent that acts $ A_t $ based on the feedback reward signal $ R_t $ and observation
+$ O_T $ each time step t. The environment will receive action $ A_t $ and emit reward $ R_{t+1} $ and observation $ O_{t+1} $ for the next time step: </p>
 
-<p>Note that <a href="https://khan.github.io/KaTeX/">KaTeX</a> is work in progress, so it does not support the full range of math expressions as, say, <a href="https://www.mathjax.org/">MathJax</a>. Yet, it is <a href="http://www.intmath.com/cg5/katex-mathjax-comparison.php">blazing fast</a>.</p>
+<p align="center">
+  <img src=https://user-images.githubusercontent.com/18066876/49680574-78175b80-fac8-11e8-8c0b-7549ae4b78d8.PNG alt="drawing" width="400" height="400">
+</p>
+
+<p>Both agent and environment has its own internal state
+  $ S_t^a $ and $ S_t^e $ respectively. We can formulate agent state as a function of history $ S_t^a=f(H_t) $. </p>
+
+<h3> Markov Decision Process (MDP) </h3>
+
+<p> MDP serves as an effective mathematical foundation for the problem of RL, it formally describes an environment of RL. For instance, almost all RL problems can be formalised as MDPs: </p>
+
+<ul>
+  <li>Optimal Control can be formulated with continuous MDPs</li>
+  <li>Partially Observable problems can be converted into MDPs</li>
+  <li>Bandits are MDPs with one state. </li>
+</ul>
+
+<p> MDP fits correctly with the RL characteristics when RL agent has all information about the environment (full observability), where RL agent is stochastic, time-dependent and action affecting subsequent data. This document will introduce MDP definitions and formulations, the next posts will discuss how to solve MDPs and apply it to RL problems. </p>
+
+<h3> Markov Process (Markov Chain) </h3>
+
+<p>Markov Process is a mermoryless random process, i.e a sequence of random state $ S_t $ has the property: </p>
+
+  $$ P[S_{t+1}|S_t]=P[S_{t+1}|S_1,...,S_t] $$
+
+<p> The property means that the state captures all relevant information from the history, so history can be discarded, assuming the agent is full observability $ O_t=S_t^a=S_t^e $. Intuitively, we can connect from the fact that the environment state is indeed Markov, hence the agent state is also Markov if the system is fully observable.
+   On the other hand, if the current state $ S_t $ is characterized by the fully observed history $H_t$, then the function $ S_t = f(H_t) $ can be expressed with certainty (no loss), hence the Markov property ($S_{t+1}$ depend only on $S_t$). </p>
+
+<p> If we have finite n state $ S_1,...,S_n $, the state transitions P can be characterized by a matrix: </p>
+
+  $$ \begin{bmatrix}
+      P_{11} & ... & P_{1n}\\
+      ... & & \\
+      P_{n1} & ... & P_{nn}
+      \end{bmatrix} $$
+
+<h3> Markov Reward Process (MRP) </h3>
+
+<p> Basically, MRP is Markov chain with values for each state. The value of each state measures how good to be in that state. To be concrete, MRP is a tuple $ (S,P,R,\gamma) $: </p>
+
+<ul>
+  <li>S is a finite set of states</li>
+  <li>P is state transition probability matrix, $ P_{ss'} = P[S_{t+1}=s'|S_t=s] $</li>
+  <li>R is a (immediate) reward function for each state, R_s=E[R_{t+1}|S_t=s] </li>
+  <li>$ \gamma $ is a discount factor ranging from 0 to 1.</li>
+</ul>
+
+<p> The value function $ v(s) $ computes value for each state is the expected reward return starting from state $s$: </p>
+
+  $$ v(s)= E[G_t|S_t=s] $$
+
+where return G is
+
+  $$ G_t = R_{t+1}+\gamma R_{t+2}+...=\sum_{k=0}^\infty \gamma^k R_{t+k+1} $$
+
+<p> Intuitively, the function value averages all possible reward return path from state s to the terminal state of MRP (terminal state to avoid infinite return), where each path has a unique return G. The factor $ \gamma $ discounts G to also avoid infinite return G when there are infinite state sequences, and to represent uncertainty of far future reward and favoring immediate rewards. </p>
+
+<p> The value function can be in the form of Bellman equation: </p>
+
+  $$ v(s)=E[R_{t+1}+\gamma v(S_{t+1})|S_t=s] $$
+
+or
+
+  $$ v(s)=R_s+ \gamma \sum_{s' \in S}P_{ss'}v(s') $$
+
+<p> To be able to solve for $v(s)$, we must represent Bellman function in matrix form:</p>
+
+  $$ v = R + \gamma Pv $$
+
+and solve for $v$:
+
+  $$ v=(I-\gamma P)^{-1}R $$
+
+<h3>Markov Decision Process (MDP)</h3>
+
+<p> MDP is a Markov reward process with decisions to act on the environment, and then the enviroment will stochastically transition to the next state s'. Please note that all states in MDP are Markov. A MDP is a tuple $S,A,P,R, \gamma$ :</p>
+
+<ul>
+  <li>S is a finite set of states</li>
+  <li>A is a finite set of actions</li>
+  <li>P is state transition probability matrix, $ P_{ss'}^a = P[S_{t+1}=s'|S_t=s,A_t=a] $</li>
+  <li>R is a (immediate) reward function for each state, R_s^a=E[R_{t+1}|S_t=s,A_t=a] </li>
+  <li>$ \gamma $ is a discount factor ranging from 0 to 1.</li>
+</ul>
+
+<p>To extend from MRP, MDP defines a policy distribution over a set of agent's actions on state $s$:</p>
+
+  $$ \pi(a|s)=P[A_t=a|S_t=s] $$
+
+<p> The policies are depend on the current state $s$ (not the history) and are stationary(time-independent).
+MDP also redefines the state-value function and action-value function, which are the expected return starting from state $s$ and then following the policy $\pi$: </p>
+
+  $$ v_\pi(s)=E_\pi[G_t|S_t=s] $$
+
+  $$ q_\pi(s,a) = E_\pi[G_t|S_t=s,A_t=a] $$
+
+<p> we then rewrite these equation as Bellman Expectation equations: </p>
+
+  $$ v_\pi(s) = E_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})|S_t=s] $$
+
+  $$ q_\pi(s,a) = E_\pi[R_{t+1}+\gamma q_\pi(S_{t+1},A_{t+1})|S_t=s,A_t=a] $$
+
+<p>After simple transformations, we can see their inter-relation as follow:</p>
+
+  $$ v_\pi(s) = \sum_{a \in A}\pi(a|s)q_\pi(s,a) $$
+
+  $$ q_\pi(s,a) = R_s^a+\gamma \sum_{s' \in S}P_{ss'}^av_\pi(s')$$
+
+<p>which leads us to the state-value transition function and action-value transition function: </p>
+
+  $$ v_\pi(s) =\sum_{a \in A}\pi(a|s)(R_s^a+\gamma \sum_{s' \in S}P_{ss'}^av_\pi(s')) $$
+
+  $$ q_\pi(s,a) = R_s^a+\gamma \sum_{s' \in S}P_{ss'}^a\sum_{a' \in A}\pi(a'|s')q_\pi(s',a') $$
+
+<p>We can solve MDP state-value function by Bellman Expectation equation in matrix form: </p>
+
+  $$ v_\pi = (I - \gamma P^\pi)^{-1}R^\pi $$
+
+where
+
+  $$ P_{ss'}^\pi = \sum_{a \in A}\pi(a|s)P_{ss'}^a $$
+
+  $$ R_{s}^\pi = \sum_{a \in A}\pi(a|s)R_{s}^a $$
+
+<p>It is computationally hard to compute state-value function, which is O(n^3) for n states. We must use iterative methods for large set of states, e.g Dynamic Programming, Monte-Carlo evaluation, Temporal-Different learning, etc. </p>
+
+<h3>Optimal Policy for MDP</h3>
+
+<p>We define the optimal state-value function and action-value function are the maximum of these function over all policies:</p>
+
+  $$ v_*(s) = \underset{\pi}{max}v_\pi(s) $$
+
+  $$ q_*(s,a) = \underset{\pi}{max}q_\pi(s,a) $$
+
+<p>The optimal value function specifies the best possible performance in MDP. We reply on MDP theorem to find optimal policies:</p>
+
+<ul>
+  <li>There exists an optimal policy that is better than all other policies $ \pi_* \geq \pi, \forall \pi $</li>
+  <li>There may be multiple solution to achieve optimal state-value function and action-value function.</li>
+</ul>
+
+<p>If we know optimal $q_*(s,a)$, we immediately have the optimal policy. We can solve recursively for optimal state-value function and action-value function through these Bellman optimality function:</p>
+
+  $$ v_*(s) = \underset{a}{max}R_s^a+\gamma \sum_{s' \in S}P_{ss'}^av_*(s') $$
+
+  $$ q_*(s,a) = R_s^a+\gamma \sum_{s' \in S}P_{ss'}^a\underset{a'}{max}q_*(s',a')$$
+
+<p>Again, Bellman optimality equations is non-linear and have no close form solution. We must use iterative methods to solve them, e.g Value Iterative, Policy iteration, Q-learning, Sarsa.</p>
 
   </article>
 
@@ -116,7 +272,7 @@
     <footer>
 
   <div class="wrapper">
-    &copy; Copyright 2018 an T. Le.
+    &copy; Copyright 2018 An T. Le.
     Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
 
 
@@ -130,14 +286,6 @@
 
 <!-- Load Common JS -->
 <script src="/anindex.github.io/assets/js/common.js"></script>
-
-
-<!-- Load KaTeX -->
-<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
-<script src="/anindex.github.io/assets/js/katex.js"></script>
-
-
 
 
 <!-- Include custom icon fonts -->

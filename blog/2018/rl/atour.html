@@ -103,7 +103,6 @@ To begin, this is the introductory headline of the field: </p>
 
  <q> Actionable Intelligence is the study of  how to use past data to enhance the future manipulation of a dynamical system </q>
 
-<br/>
 <p> I know some Computer Science guys at my Uni said that Deep RL is the key to achieve The Singularity (lol), and yes there are strong supports that RL has defeated human in Go, Atari game, etc. To be honest, I doubted about that audacious blame. At that time, I thought that Deep RL achieved these performances in perfect environment without measurement error and no hidden game states, but how can we so sure that it will achieve the same in dynamic and imperfect environment of industrial systems? <p/>
 
 <p> The tour of Ben Recht indeed clears my doubts, there is a whole pool of problems to solve. Why is it so hard to optimal control a system given unknown dynamic states? RL has to be the one that could easily solve this kind of problem. The answer is simple, the stakes could not be higher if we would like to guarantee safety executions and valuable gains (both are defined by reward function) by a series of action in uncertainty. Afterall, RL is to find (randomly or heuristic) a series of action <strong>u</strong> to maximize reward function <strong>r</strong>. </p>
@@ -112,7 +111,7 @@ To begin, this is the introductory headline of the field: </p>
 
 <p> As Prof. Recht stated his point: </p>
 
-<q> If a machine learning does crazy things when restricted to linear models, it's going to do crazy things on complex nonlinear models too. </q>
+<p> <q> If a machine learning does crazy things when restricted to linear models, it's going to do crazy things on complex nonlinear models too. </q> </p>
 
 <p> And reversely, if your ML algorithm has good results on non-linear models, it has to be get acceptable results on linear models too. Otherwise, it is unreasonable to trust your model. Therefore, LQR has come to save the day as a test-bed for everything new popped out of your head.
 
@@ -180,11 +179,11 @@ We have these roads to follow: </p>
 
   $$ \hat{A},\hat{B}=\underset{A,B}{min}\sum_{t=1}^{T-1}||x_{t+1}-Ax_t-Bu_t||^2$$
 
-Then we plug these matrices to state transition function with an error $v_t$:
+<p> Then we plug these matrices to state transition function with an error $v_t$: </p>
 
   $$ x_{t+1}=\hat{A}x_t+\hat{B}u_t+v_t $$
 
-<p> Actually, if we treat $ \hat{A}, \hat{B} $ as true dynamic matrices, it does not feel right. So far, this approach finds solution <strong>u</strong> based on what we just estimated $ \hat{A}, \hat{B} $. Here is the burning question: How can we model the uncertainty (errors) of our estimation and then use that to design solution <strong>u</strong> to robust control the system?
+<p> Actually, if we treat $ \hat{A}, \hat{B} $ as true dynamic matrices, it does not feel right. So far, this approach finds solution <strong>u</strong> based on what we just estimated $ \hat{A}, \hat{B} $. Here is the burning question: How can we model the uncertainty (errors) of our estimation and then use that to design solution <strong>u</strong> to robust control the system? </p>
 
 <p> To answer that question, there are recent works of (again) Prof.Recht's group about Coarsed-ID control addressing this problem. These works will be discussed in next posts. </p>
 
@@ -199,7 +198,7 @@ Then we plug these matrices to state transition function with an error $v_t$:
 
 <p> For now, we do not go to detail of these methods. PID is also a model-free method that find <strong>u</strong> based on just the error, but PID can learn to compensate for poor models, changing conditions? This leads us to a burning topic from PID to RL: </p>
 
-<q> How well must we understand the system in order to optimal control it? </q>
+<p> <q> How well must we understand the system in order to optimal control it? </q> </p>
 <br/>
 <p> The next few posts we will discuss how we balance between optimal policy solution versus computation cost to process the system state samples and how fast these methods find solution that leads system to stability. </p>
 

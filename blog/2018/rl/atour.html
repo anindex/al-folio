@@ -14,7 +14,15 @@
 
   <link rel="stylesheet" href="/anindex.github.io/assets/css/main.css">
   <link rel="canonical" href="/anindex.github.io/blog/2018/rl/">
-  <script src="/anindex.github.io/assets/js/auto-render.js" type="text/javascript"></script>
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+  </script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
 </head>
 
 
@@ -110,27 +118,22 @@ To begin, this is the introductory headline of the field: </p>
 
 LQR is a special case of optimal control problem when we know the state transitions function and we design the cost function to represent our task: </p>
 
-<p align="center">
-  <code class="highlighter-rouge">$$ minE_e[\sum_{t=1}^{T}C_t(x_t,u_t) $$</code>
-</p>
-<p align="center">
-  <code class="highlighter-rouge">$$ x_{t+1}=f_t(x_t,u_t,e_t) $$</code>
-</p>
-<p align="center">
-  <code class="highlighter-rouge">$$ u_t=\pi_t(\tau_t) $$</code>
-</p>
+  $$ minE_e[\sum_{t=1}^{T}C_t(x_t,u_t)] $$
+
+  $$ x_{t+1}=f_t(x_t,u_t,e_t) $$
+
+  $$ u_t=\pi_t(\tau_t) $$
+
 
 With LQR (continuous version), the state transition function is linear and the cost becomes quadratic:
 
-<p align="center">
-  <code class="highlighter-rouge">$$ E[\frac{1}{T}\sum_{t=1}^{T}x_t^TQx_t+u_t^TRu_t+x_T^TP_Tx_T] $$</code>
-</p>
+  $$ E[\frac{1}{T}\sum_{t=1}^{T}x_t^TQx_t+u_t^TRu_t+x_T^TP_Tx_T] $$
 
-<p align="center">
-  <code class="highlighter-rouge">$$ x_{t+1}=Ax_t+Bu_t+e_t $$</code>
-</p>
 
-<p>Intuitively, you must find a series of action <code class="highlighter-rouge">$$ u_t $$</code> in order to minimize the quadratic cost expected over error (to get mean error). Next section will introduce some approaches to find the optimal (or not) policy and how fast they converge to minimum cost with a fixed amount of samples. The raising question is how we can balance between optimal cost and computation to process as least as possible many samples.
+  $$ x_{t+1}=Ax_t+Bu_t+e_t $$
+
+
+<p>Intuitively, you must find a series of action $ u_t $ in order to minimize the quadratic cost expected over error (to get mean error). Next section will introduce some approaches to find the optimal (or not) policy and how fast they converge to minimum cost with a fixed amount of samples. The raising question is how we can balance between optimal cost and computation to process as least as possible many samples.
 
 I have not implemented any approaches in RL to try to solve LQR yet, but it seems pretty straightforward to implement. However, Prof. Recht mentioned LQR is not easy, "magic tends to happen in LQR". I do not know if this is true until I get my hand dirty on evaluating these approaches. </p>
 
@@ -140,35 +143,26 @@ I have not implemented any approaches in RL to try to solve LQR yet, but it seem
 
 For finite-time horizon, discrete-time LQR: </p>
 
-<p align="center">
-  <code class="highlighter-rouge">$$ u_t=-K_tx_t $$</code>
-</p>
+  $$ u_t=-K_tx_t $$
 
 where
 
-<p align="center">
-  <code class="highlighter-rouge">$$ K_t=-(B^TP_{t+1}B+R)^{-1}B^TP_{t+1}A $$</code>
-</p>
+  $$ K_t=-(B^TP_{t+1}B+R)^{-1}B^TP_{t+1}A $$
+
 
 and
+  $$ P_t=Q+A^TP_{t+1}A-A^TP_{t+1}B(R+B^TP_{t+1}B)^{-1}B^TP_{t+1}A $$
 
-<p align="center">
-  <code class="highlighter-rouge">$$ P_t=Q+A^TP_{t+1}A-A^TP_{t+1}B(R+B^TP_{t+1}B)^{-1}B^TP_{t+1}A $$</code>
-</p>
-
-<p>When we know the state transition, we know A and B in linear equation. The optimal solution is founded by recursively find ![alt text](https://latex.codecogs.com/gif.latex?P_{t+1}) from terminal condition ![alt text](https://latex.codecogs.com/gif.latex?P_T). Then we can find series ![alt text](https://latex.codecogs.com/gif.latex?u_t).
+<p>When we know the state transition, we know A and B in linear equation. The optimal solution is founded by recursively find $ P_{t+1} $ from terminal condition $ P_t $. Then we can find series $ u_t $.
 
 When the time T approaches infinity, the optimal solution of <strong>u</strong> becomes static. Solving Riccati equation of P, we get: </p>
 
-<p align="center">
-  <code class="highlighter-rouge">$$ P=Q+A^TPA-A^TPB(R+B^TPB)^{-1}B^TPA $$</code>
-</p>
 
-<p align="center">
-  <code class="highlighter-rouge">$$ K=-(B^TPB+R)^{-1}B^TPA$$</code>
-</p>
+  $$ P=Q+A^TPA-A^TPB(R+B^TPB)^{-1}B^TPA $$
 
-<p> As we can see, the optimal solution <strong>u</strong> is independence of error variance, which means more noise do not affect system control. In infinite-time scheme, solution **u** is time-invariant.
+  $$ K=-(B^TPB+R)^{-1}B^TPA$$
+
+<p> As we can see, the optimal solution <strong>u</strong> is independence of error variance, which means more noise do not affect system control. In infinite-time scheme, solution <strong>u</strong> is time-invariant.
 
 The questions is, when we do not know state transition function, we do not know A, B in advanced, how can we solve LQR for optimal control? This is the place that RL shined.
 
@@ -184,17 +178,13 @@ We have these roads to follow: </p>
 
 <p> I am personally like the first approach, because that's what Control Theory guys usually do anyway :). They called this approach System Identification. However, in ML manner, we do not use the glory of Physics to model the system. What we are going to do is trying to learn the state-transition function, which means we will fit the matrix A and B with some cost function by choices. For example, we use L2 loss to fit A, B: </p>
 
-<p align="center">
-  <code class="highlighter-rouge">$$ \hat{A},\hat{B}=\underset{A,B}{min}\sum_{t=1}^{T-1}||x_{t+1}-Ax_t-Bu_t||^2$$</code>
-</p>
+  $$ \hat{A},\hat{B}=\underset{A,B}{min}\sum_{t=1}^{T-1}||x_{t+1}-Ax_t-Bu_t||^2$$
 
-Then we plug these matrices to state transition function with an error ![alt text](https://latex.codecogs.com/gif.latex?v_t):
+Then we plug these matrices to state transition function with an error $v_t$:
 
-<p align="center">
-  <code class="highlighter-rouge">$$ x_{t+1}=\hat{A}x_t+\hat{B}u_t+v_t $$</code>
-</p>
+  $$ x_{t+1}=\hat{A}x_t+\hat{B}u_t+v_t $$
 
-<p> Actually, if we treat <code class="highlighter-rouge">$$ \hat{A}, \hat{B} $$</code> as true dynamic matrices, it does not feel right. So far, this approach finds solution <strong>u</strong> based on what we just estimated <code class="highlighter-rouge">$$ \hat{A}, \hat{B} $$</code>. Here is the burning question: How can we model the uncertainty (errors) of our estimation and then use that to design solution <strong>u</strong> to robust control the system?
+<p> Actually, if we treat $ \hat{A}, \hat{B} $ as true dynamic matrices, it does not feel right. So far, this approach finds solution <strong>u</strong> based on what we just estimated $ \hat{A}, \hat{B} $. Here is the burning question: How can we model the uncertainty (errors) of our estimation and then use that to design solution <strong>u</strong> to robust control the system?
 
 <p> To answer that question, there are recent works of (again) Prof.Recht's group about Coarsed-ID control addressing this problem. These works will be discussed in next posts. </p>
 
@@ -203,14 +193,14 @@ Then we plug these matrices to state transition function with an error ![alt tex
 <p> This section is huge! I cannot write the section down with few lines, it is even fit to have many intensive courses in RL. And yes, this is the realm of RL, everyone like it :). This section serves as introductory point for the next few posts. Basically, as the name stated, we do not care about the system dynamic, what we do is to mitigate cost function by: </p>
 
 <ul>
-  <li>Iteratively refining cost function based on measured system state and estimating policy ![alt text](https://latex.codecogs.com/gif.latex?u_t) from the cost function each time step: **Approximate Dynamic Programming**.</li>
-  <li>Defining a parametrized distribution <code class="highlighter-rouge">$$ p(u;\vartheta) $$</code> over <code class="highlighter-rouge">$$ u_t $$</code> and use gradient ascent for some average reward function of <code class="highlighter-rouge">$$ u_t $$</code> to refine iteratively the parametrized distribution <code class="highlighter-rouge">$$ p(u;\vartheta) $$</code>. The purpose is to minimize cost function expected over that distribution: **Direct Policy Search**.</li>
+  <li>Iteratively refining cost function based on measured system state and estimating policy $ u_t $ from the cost function each time step: <strong>Approximate Dynamic Programming</strong>.</li>
+  <li>Defining a parametrized distribution $ p(u;\vartheta) $ over $ u_t $ and use gradient ascent for some average reward function of $ u_t $ to refine iteratively the parametrized distribution $ p(u;\vartheta) $. The purpose is to minimize cost function expected over that distribution: <strong>Direct Policy Search</strong>.</li>
 </ul>
 
 <p> For now, we do not go to detail of these methods. PID is also a model-free method that find <strong>u</strong> based on just the error, but PID can learn to compensate for poor models, changing conditions? This leads us to a burning topic from PID to RL: </p>
 
 <q> How well must we understand the system in order to optimal control it? </q>
-
+<br/>
 <p> The next few posts we will discuss how we balance between optimal policy solution versus computation cost to process the system state samples and how fast these methods find solution that leads system to stability. </p>
 
 
@@ -240,14 +230,6 @@ Then we plug these matrices to state transition function with an error ![alt tex
 
 <!-- Load Common JS -->
 <script src="/anindex.github.io/assets/js/common.js"></script>
-
-
-<!-- Load KaTeX -->
-<link rel="stylesheet" href="/anindex.github.io/assets/js/katex.min.css">
-<script src="/anindex.github.io/assets/js/katex.min.js"></script>
-<script src="/anindex.github.io/assets/js/katex.js"></script>
-
-
 
 
 <!-- Include custom icon fonts -->

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>Le Thai An | Mapping MDP to games and find optimal policies</title>
+  <meta name="description" content="An T. Le personal website">
+
+  <link rel="shortcut icon" href="/anindex.github.io/assets/img/favicon.ico">
+
+  <link rel="stylesheet" href="/anindex.github.io/assets/css/main.css">
+  <link rel="canonical" href="/anindex.github.io/blog/2018/rl/">
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+  </script>
+
+  <!-- Load KaTeX -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
+  <script src="../../../assets/js/katex.js"></script>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+  <link rel="stylesheet" href="../../../assets/css/pseudocode.min.css">
+  <script src="../../../assets/js/pseudocode.min.js"></script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+
+    <span class="site-title">
+
+        <strong>Le</strong> Thai An
+    </span>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+      <div class="trigger">
+        <!-- About -->
+        <a class="page-link" href="/anindex.github.io/">about</a>
+
+        <!-- Blog -->
+        <a class="page-link" href="/anindex.github.io/blog/">blog</a>
+
+        <!-- Pages -->
+
+
+            <a class="page-link" href="/anindex.github.io/projects/">projects</a>
+
+
+
+            <a class="page-link" href="/anindex.github.io/publications/">publications</a>
+
+
+        <!-- CV link -->
+        <a class="page-link" href="/anindex.github.io/assets/pdf/CV.pdf">vitae</a>
+
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Mapping MDP to games and find optimal policies</h1>
+    <p class="post-meta">January 07, 2019</p>
+  </header>
+
+  <article class="post-content">
+    <h3> From game to MDP realization </h3>
+    <p> In the last blog, I have introduced MDP, which is a general environment mathematical-based abstraction, can be represented to almost every perfect environments (no system or random uncertainties).
+      Games or simulation-based environments can be considered perfect environment that we can realize MDP on these environments. Note that there are many other environment abstractions beside MDP that RL can be applied e.g LQR, Partial Observable MDP.
+    </p>
+
+    <p>In this blog, I use Easy21 as an test-bed game environment for many RL algorithms (agents) to learn optimal policies. Easy21 is similar to the BlackJack example in Sutton and Barto RL book, however, the rules are different and non standard.
+      Easy21 environment is also an exercise of <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching.html">David Silver - UCL Course on RL</a>,
+      more about its game specification can be found <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/Easy21-Johannes.pdf">here</a>.
+    </p>
+
+    <p>We can define the state $s$ of Easy21 MDP as vector of accumulated player score and initial dealer score (first black card draw by dealer). As you can see, player score must be in range from 1 to 21 and initial dealer score is in range from 1 to 10.
+      Therefore, we will have total of 21x10 states, and hence we can apply Value Iteration (VI) or Policy Iteration (PI) without worrying about tractability of the algorithm. However, that would be the case only when we can realize the state transition probability matrix of this MDP easily, in this case, it does not.
+      This is also the reason I choose this environment to demonstrate that some environments may have low number of states but are difficult to realize its dynamic and we have to use model-free RL methods to learn its optimal policy.
+    </p>
+
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/state.PNG" alt="drawing" width="400" height="400">
+    </p>
+
+    <p>To explain why, we will attempt to compute 210x210 state transition matrix $P$ of Easy21. Let us consider the probability to transition from state $(10, 5)$ to $(11, 5)$ (remember that initial dealer score is unchange), how many ways can we accumulate score to get from 10 to 11? If we only add up the score, the answer is 1 and the transition probability is the probability that we draw card number one $P_{s,s'}=\frac{1}{10}$.
+    However, in Easy21 we can add up or minus the score by drawing black or red card respectively, hence there are infinite ways to accumulate score from 10 to 11 (e.g 10 + 1, 10 - 3 + 4, etc) and transition probability is $P_{s, s'}=\prod P_i$ </p>. Therefore, computing state transition matrix $P$ becomes intractable.
+    It is clear that we cannot apply VI or PI to solve optimal policy for this game. In next sections, I will introduce some popular value-based model-free RL algorithm with different schemes to learn Easy21 optimal policies. In the next blogs, policy-based RL algorithms will be introduced and evaluated.
+
+    <h3> Approaches to find optimal policies </h3>
+
+    <h4> Table lookup Q: Monte-Carlo Control </h4>
+
+    <h4> Table lookup Q: TD($ \lambda $) Sarsa </h4>
+
+    <h4> Approximated Q: TD($ \lambda $) Sarsa </h4>
+
+    <h3> Discussion </h3>
+
+
+    <pre hidden id="hello-world-code">
+      \begin{algorithmic}
+      \PRINT \texttt{'hello world'}
+      \end{algorithmic}
+    </pre>
+
+    <script type="text/javascript">
+      var code = document.getElementById("hello-world-code").textContent;
+      var parentEl = document.body;
+      var options = {
+        lineNumber: true
+      };
+      pseudocode.render(code, parentEl, options);
+    </script>
+
+  </article>
+
+
+
+</div>
+
+      </div>
+    </div>
+
+    <footer>
+
+  <div class="wrapper">
+    &copy; Copyright 2018 An T. Le.
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
+
+
+  </div>
+
+</footer>
+
+    <!-- Load jQuery -->
+<script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<!-- Load Common JS -->
+<script src="/anindex.github.io/assets/js/common.js"></script>
+
+
+<!-- Include custom icon fonts -->
+<link rel="stylesheet" href="/anindex.github.io/assets/css/fontawesome-all.min.css">
+<link rel="stylesheet" href="/anindex.github.io/assets/css/academicons.min.css">
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-XXXXXXXXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+
+</html>

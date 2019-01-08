@@ -113,38 +113,97 @@
     </p>
 
     <p align="center">
-      <img src="/anindex.github.io/assets/img/state.PNG" alt="drawing" width="400" height="400">
+      <img src="/anindex.github.io/assets/img/state.PNG" alt="drawing" width="400" height="550">
     </p>
 
     <p>To explain why, we will attempt to compute 210x210 state transition matrix $P$ of Easy21. Let us consider the probability to transition from state $(10, 5)$ to $(11, 5)$ (remember that initial dealer score is unchange), how many ways can we accumulate score to get from 10 to 11? If we only add up the score, the answer is 1 and the transition probability is the probability that we draw card number one $P_{s,s'}=\frac{1}{10}$.
-    However, in Easy21 we can add up or minus the score by drawing black or red card respectively, hence there are infinite ways to accumulate score from 10 to 11 (e.g 10 + 1, 10 - 3 + 4, etc) and transition probability is $P_{s, s'}=\prod P_i$ </p>. Therefore, computing state transition matrix $P$ becomes intractable.
-    It is clear that we cannot apply VI or PI to solve optimal policy for this game. In next sections, I will introduce some popular value-based model-free RL algorithm with different schemes to learn Easy21 optimal policies. In the next blogs, policy-based RL algorithms will be introduced and evaluated.
+    However, in Easy21 we can add up or minus the score by drawing black or red card respectively, hence there are infinite ways to accumulate score from 10 to 11 (e.g 10 + 1, 10 - 3 + 4, etc) and transition probability is $P_{s, s'}=\sum\prod P_i$. Therefore, computing state transition matrix $P$ becomes intractable.
+    In general, these are the informal steps that we usually do in MDP realization: </p>
+
+    <ol>
+      <li>Define state space $S$. In games, it's usually the same type with observation $O$ or direct observable output from environment.</li>
+      <li>Infer action space $A$ from each state $s \in S$. (e.g in Easy21, at each state we can "hit" or "stick"</li>
+      <li>Compute state transition probability matrix $P$ from enviroment dynamic.</li>
+      <li>Three ways to define reward function: terminal rewards, intermediate rewards or both. It's depend on the requirements of the RL problem. </li>
+    </ol>
+
+
+    <p>It is clear that we cannot apply VI or PI to solve optimal policy for this game. In next sections, I will introduce some popular value-based model-free RL algorithm with different schemes to learn Easy21 optimal policies. In the next blogs, policy-based RL algorithms will be introduced and evaluated. </p>
 
     <h3> Approaches to find optimal policies </h3>
 
-    <h4> Table lookup Q: Monte-Carlo Control </h4>
+    <p>In this section, I implement Monte-Carlo Control and TD($\lambda$) Sarsa algorithm to learn optimal policies of Easy21 under two different settings: table lookup $Q$ function and downsampling $Q$ function approximation. In addition, for balancing between exploration and exploitation, I update policy by $\epsilon$-greedy with GLIE schedule.
+      Pseudocode for algorithm is presented in each section. If you are interested in actual implementation, it can be found in my <a href="https://github.com/anindex/reinforcement-learning-practice/blob/master/exercises/david-silver-course/easy21.ipynb">repository</a>.
+    </p>
+
+    <h4> Table lookup Q: Every-visit Monte-Carlo (MC) Control </h4>
+
+    <p>Although the state-space of Easy21 is small enough to sweep full backup to calculate $Q$ at each state-action pair, we do not know the state transition matrix. In this case, we sample the series of state-action-reward tuple $(s, a, r, s', a')$ by letting RL agent interacts with environment based on its current policy.
+      In MC Control, we update $Q(s_t, a_t)$ by adding error between new return $G_t$ and current $Q(s_t, a_t)$ scaled by a regulated step size $\alpha_t$:
+    </p>
+
+        $$ Q(s_t, a_t) = Q(s_t, a_t) + \alpha_t(G_t - Q(s_t, a_t)) $$
+    where
+        $$ G_t = \sum_{\tau=t}^T\gamma^{\tau-t}r_{\tau} $$
+        $$ \alpha_t = \frac{1}{N(s_t, a_t)} $$
+
+    <p>Intuitively, each $Q(s_t, a_t)$ is an average of return $G_t$ as running sum so far through many episodes, the average can add new member easily by scaling new error with $\alpha_t$. We define average return as running sum like this to be compatible with
+      iterative algorithm. Note that $N(s_t, a_t)$ counts each time agent visit state $s_t$ and do action $a_t$. After each episode, we can update policy following new action function $Q$ by $\epsilon$-greedy scheme:
+    </p>
+        $$ \epsilon = \frac{N_0}{N_0 + N(s_t)}$$
+        $$ \pi(a|s) = \begin{cases}
+                      \frac{\epsilon}{m} + 1 - \epsilon & a* = argmax_{a \in A}Q(s,a) \\
+                      \frac{\epsilon}{m}  & otherwise
+                      \end{cases}  $$
+
+    <p>Updating policy with $\epsilon$-greedy scheme will ensure that $Q$ function does not converge to local minima by only exploiting. The convergence properties will be dicussed in next sections.
+       Pseudocode for MC Control can be seen as below:</p>
+
+       <pre hidden id="mc-control">
+         \begin{algorithmic}
+         Initialize $Q(s, a)$, $\all s \in S, a \in A(s)$ arbitrarily and $Q(terminal, ) = 0$
+         \FORALL{episode}:
+          Initialize first state $s$, return dictionary $G$ and eligibility trace dictionary $E$
+          \WHILE{s != terminal state}:
+          Choose action $a$ from current state and policy.
+          Observe next state $s'$ and reward $r$.
+          \FORALL{$(s, a)$ in E}
+            $E(s, a) = E(s, a) * \gamma$
+          \ENDFOR
+
+          \IF{$(s, a)$ \notin E}
+            $E(s, a) = 1$
+          \ENDIF
+
+          \FORALL{$(s, a)$ in E}
+            $G(s, a) = G(s, a) + E(s, a) * \gamma$
+          \ENDFOR
+
+          $s = s'$
+          \ENDWHILE
+
+          \FORALL{$(s, a)$ in G}
+            $Q(s, a) = Q(s, a) + \alpha_t (G(s, a) - Q(s, a))$
+          \ENDFOR
+         \ENDFOR
+         \end{algorithmic}
+       </pre>
+
+       <script type="text/javascript">
+         var code = document.getElementById("mc-control").textContent;
+         var parentEl = document.body;
+         var options = {
+           lineNumber: true
+         };
+         pseudocode.render(code, parentEl, options);
+       </script>
+
 
     <h4> Table lookup Q: TD($ \lambda $) Sarsa </h4>
 
     <h4> Approximated Q: TD($ \lambda $) Sarsa </h4>
 
     <h3> Discussion </h3>
-
-
-    <pre hidden id="hello-world-code">
-      \begin{algorithmic}
-      \PRINT \texttt{'hello world'}
-      \end{algorithmic}
-    </pre>
-
-    <script type="text/javascript">
-      var code = document.getElementById("hello-world-code").textContent;
-      var parentEl = document.body;
-      var options = {
-        lineNumber: true
-      };
-      pseudocode.render(code, parentEl, options);
-    </script>
 
   </article>
 

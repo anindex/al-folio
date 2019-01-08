@@ -22,14 +22,6 @@
   });
   </script>
 
-  <!-- Load KaTeX -->
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css">
-  <script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.js"></script>
-  <script src="../../../assets/js/katex.js"></script>
-
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
-  <link rel="stylesheet" href="../../../assets/css/pseudocode.min.css">
-  <script src="../../../assets/js/pseudocode.min.js"></script>
 </head>
 
 
@@ -152,51 +144,25 @@
     </p>
         $$ \epsilon = \frac{N_0}{N_0 + N(s_t)}$$
         $$ \pi(a|s) = \begin{cases}
-                      \frac{\epsilon}{m} + 1 - \epsilon & a* = argmax_{a \in A}Q(s,a) \\
+                      \frac{\epsilon}{m} + 1 - \epsilon & a^* = argmax_{a \in A}Q(s,a) \\
                       \frac{\epsilon}{m}  & otherwise
                       \end{cases}  $$
 
     <p>Updating policy with $\epsilon$-greedy scheme will ensure that $Q$ function does not converge to local minima by only exploiting. The convergence properties will be dicussed in next sections.
        Pseudocode for MC Control can be seen as below:</p>
 
-       <pre hidden id="mc-control">
-         \begin{algorithmic}
-         Initialize $Q(s, a)$, $\all s \in S, a \in A(s)$ arbitrarily and $Q(terminal, ) = 0$
-         \FORALL{episode}:
-          Initialize first state $s$, return dictionary $G$ and eligibility trace dictionary $E$
-          \WHILE{s != terminal state}:
-          Choose action $a$ from current state and policy.
-          Observe next state $s'$ and reward $r$.
-          \FORALL{$(s, a)$ in E}
-            $E(s, a) = E(s, a) * \gamma$
-          \ENDFOR
+       <p align="center">
+         <img src="/anindex.github.io/assets/img/mccontrol.PNG" alt="drawing" width="400" height="400">
+       </p>
 
-          \IF{$(s, a)$ \notin E}
-            $E(s, a) = 1$
-          \ENDIF
+    <p>I run MC Control on Easy21 enviroment implemented as an extension of OpenAI gym framework. Source code of Easy21 enviroment can be found <a href="https://github.com/anindex/reinforcement-learning-practice/tree/master/exercises/david-silver-course/gym-easy21">here</a>
+      After 500000 episodes, the value function $V$ starts to converge as shown below. Note that I derive value function $V$ from $Q$ by $V(s) = max_aQ(s,a)$, the policy is also derived by the same manner.
+    </p>.
 
-          \FORALL{$(s, a)$ in E}
-            $G(s, a) = G(s, a) + E(s, a) * \gamma$
-          \ENDFOR
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/mcresult.PNG" alt="drawing" width="500" height="400">
+    </p>
 
-          $s = s'$
-          \ENDWHILE
-
-          \FORALL{$(s, a)$ in G}
-            $Q(s, a) = Q(s, a) + \alpha_t (G(s, a) - Q(s, a))$
-          \ENDFOR
-         \ENDFOR
-         \end{algorithmic}
-       </pre>
-
-       <script type="text/javascript">
-         var code = document.getElementById("mc-control").textContent;
-         var parentEl = document.body;
-         var options = {
-           lineNumber: true
-         };
-         pseudocode.render(code, parentEl, options);
-       </script>
 
 
     <h4> Table lookup Q: TD($ \lambda $) Sarsa </h4>

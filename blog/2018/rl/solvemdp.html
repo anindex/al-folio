@@ -140,7 +140,7 @@
         $$ \alpha_t = \frac{1}{N(s_t, a_t)} $$
 
     <p>Intuitively, each $Q(s_t, a_t)$ is an average of return $G_t$ as running sum so far through many episodes, the average can add new member easily by scaling new error with $\alpha_t$. We define average return as running sum like this to be compatible with
-      iterative algorithm. Note that $N(s_t, a_t)$ counts each time agent visit state $s_t$ and do action $a_t$. After each episode, we can update policy following new action function $Q$ by $\epsilon$-greedy scheme:
+      iterative algorithm. Note that $N(s_t, a_t)$ counts every time agent visit state $s_t$ and do action $a_t$. After each episode, we can update policy following new action function $Q$ by $\epsilon$-greedy scheme:
     </p>
         $$ \epsilon = \frac{N_0}{N_0 + N(s_t)}$$
         $$ \pi(a|s) = \begin{cases}
@@ -163,13 +163,57 @@
       <img src="/anindex.github.io/assets/img/mcresult.PNG" alt="drawing" width="500" height="400">
     </p>
 
-
-
     <h4> Table lookup Q: TD($ \lambda $) Sarsa </h4>
 
+    <p>Like MC Control, TD($ \lambda $) Sarsa also learns optimal policy by sampling experiences. However, we does not add scaled error between full return $G_t$ and current $Q(s_t, a_t)$. Instead, intuitively, we move $Q(s_t, a_t)$ toward new bootstrapped $Q$ by applying Bellman equation.
+    We do not need to wait for reaching terminal state of each episode to update $Q(s_t, a_t)$, we update on-the-go whenever we reach state $s_t$ and do action $a_t$. This scheme is more suitable for agents to learn continuous tasks in real world (may have no terminal state or needing immediate reacts).</p>
+
+      $$ Q(s_t, a_t) = Q(s_t, a_t) + \alpha_t(q_t^{\lambda}  - Q(s_t, a_t)) $$
+    where $q_t^{\lambda}$ is a weighted sum n-steps returns $q_t^{(n)}$:
+      $$ q_t^{\lambda} = (1 - \lambda)\sum_{n=1}^{\infty}\lambda^{n-1}q_t^{(n)} $$
+
+    <p>We can think $q_t^{\lambda}$ as an average of close to far bootstrapped returns, it combines the characteristics of MC update and TD(0) update. $q_t^{\lambda}$ conveys how good the state-action pair that agent estimates combines with true sample from enviroment. We can see it more clearly in pseudocode of Backward view Td($\lambda$) Sarsa: </p>
+
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/tdsarsa.PNG" alt="drawing" width="400" height="450">
+    </p>
+
+    <p>I also run TD($\lambda$) Sarsa on Easy21 enviroment with 500000 episodes and $\lambda = 0$, the value function $V$ starts to converge as shown below. I also measure mean square error between $Q$ function learnt from Sarsa and "true" $Q$ function from MC control.</p>
+
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/tdresult.PNG" alt="drawing" width="550" height="400">
+    </p>
+
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/tdsquareerror.PNG" alt="drawing" width="550" height="400">
+    </p>
+
     <h4> Approximated Q: TD($ \lambda $) Sarsa </h4>
+    <p>In the case where the state space of MDP is very large, we could approximate $Q$ by a model. For instance, linear approximation of $Q$ would be features dot model parammeters $Q(s, a) = \phi(s, a)^T\theta$.
+      I would like to apply linear approximation on $Q$ of this simple enviroment to demonstrate how linear function approximation is done. The feature is chose as description in <a href="http://www0.cs.ucl.ac.uk/staff/d.silver/web/Teaching_files/Easy21-Johannes.pdf">Easy21 exercise</a>.
+      With function approximation, we do not update $Q$ directly, because model parammeters now represented the function $Q$. We update model parameters as follow:
+    </p>
+      $$ \theta = \theta + \alpha_t(q_t^{\lambda} - Q(s_t, a_t, \theta))\nabla_{\theta}Q(s_t, a_t, \theta) $$
+    <p> Pseudo code for function approximation of TD($\lambda$) Sarsa is the same as table lookup Q, we just need to replace update rule as specified.</p>
+
+    <p>We will evaluate this algorithm by measuring mean square error between $Q$ function learnt and "true" $Q$ function from MC control.</p>
+
+    <p align="center">
+      <img src="/anindex.github.io/assets/img/approxtdsquareerror.PNG" alt="drawing" width="550" height="400">
+    </p>
 
     <h3> Discussion </h3>
+    <p>We usually only use MC Control as a base-line for computing optimal $Q$ function for any MDP. MC Control has great learning characteristics: </p>
+    <ul>
+      <li>Unbiased estimation of Q (average of returns is unbiased).</li>
+      <li>For large enough episodes, $Q$ function computed by MC Control will converge to minimum mean square error of true $Q$ function.</li>
+    </ul>
+    <p>However, MC Control $Q$ estimation has large variance, it also needs large amount of samples to start converging and it's not suitable for online learning. In reality, one episode may never end, TD($\lambda$) Sarsa is the better option for online learning, because TD($\lambda$) Sarsa
+    uses bootstrapped estimation of current state Q (backward view TD no need to wait for end of episode). TD($\lambda$) $Q$ estimation converges to maximum likelihood estimation of environment MDP and has much lower variance compared to MC control. </p>
+
+    <p>When the state space is large, it is essential that we must downsample approximation state space to ensure tractability. However, as can be seen in evaluation, in exchange of speed as expected, approximated $Q$ function is hard to converge and introduces variance. Downsampling MDP like this may not capture the true characteristics
+    of environment.</p>
+    <p>Next blogs I will present about Policy-based algorithms in some openAI gym environment. These algorithms are promising for large state space with uncertainties in real world application.</p>
 
   </article>
 

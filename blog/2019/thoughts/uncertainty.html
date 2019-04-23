@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>Le Thai An | Some uncertain thoughts about uncertainty</title>
+  <meta name="description" content="An T. Le personal website">
+
+  <link rel="shortcut icon" href="/anindex.github.io/assets/img/favicon.ico">
+
+  <link rel="stylesheet" href="/anindex.github.io/assets/css/main.css">
+  <link rel="canonical" href="/anindex.github.io/blog/2018/rl/">
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+  </script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+
+    <span class="site-title">
+
+        <strong>Le</strong> Thai An
+    </span>
+
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+      <div class="trigger">
+        <!-- About -->
+        <a class="page-link" href="/anindex.github.io/">about</a>
+
+        <!-- Blog -->
+        <a class="page-link" href="/anindex.github.io/blog/">blog</a>
+
+        <!-- Pages -->
+
+
+
+
+
+
+
+
+            <a class="page-link" href="/anindex.github.io/projects/">projects</a>
+
+
+
+            <a class="page-link" href="/anindex.github.io/publications/">publications</a>
+
+
+
+        <!-- CV link -->
+        <a class="page-link" href="/anindex.github.io/assets/pdf/CV.pdf">vitae</a>
+
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Some uncertain thoughts about uncertainty </h1>
+    <p class="post-meta">April 23, 2019</p>
+  </header>
+
+  <article class="post-content">
+    <h3> We live in uncertain world..</h3>
+
+<p>As being unspoken rule in science, the only certainty is the uncertainty. The universe, or more particularly,
+the surrounding life around us, is changing non-linearly more and more rapidly. As we, human, tend to seek
+the absolute truth, in order to feel secure in many predictions and decisions (notable mention is Wall Street community :D). However, ironically there is
+no certainty throughout human history reasoning about surroundings, even fundamental physic laws may be false in different space or at future time. Thus, we study
+with doubts in mind, gathering information and thinking, in order to be closer to the truth. We
+will discuss about the sources of uncertainty, quantifying the uncertainty and how we treat the uncertainty in
+science and engineering. I will also write next blogs to formulate mathematical model to study uncertainties.  </p>
+
+> I was born not knowing and have only had a
+little time to change that here and there. - Richard Feynman
+
+<h3> Sources of Uncertainties</h3>
+
+
+<p>Certainty and uncertainty are foundation concepts used commonly in different field of fundamental science
+and engineering. I would be complacent, if I design a mathematical model to represent the subject
+study that only produces predictions or decisions without measurement showing degree of confident (I know I am a trustworthy person :D). The uncertainty exists in every
+corner of our model or system. Even some concepts, that have no intrinsic uncertainty, can have induced
+uncertainty from predecessor concepts. There are tangible uncertainty and unknown uncertainty. </p>
+
+<p>Fortunately, with efforts, we can identify the sources of tangible uncertainty and quantify them with
+probabilistic theory. These uncertainties are known due to incapability of intractable computation and
+observation. For instance, physicists develop quantum theories using probabilistic framework to predict
+electron appearing in double slit experiment because of the stochastic nature of subatomic particles, or mobile
+robot positions are represented as Gaussian distribution in Motion Planning. After defining probabilistic uncertaity, we are interested in how these uncertainties
+propagate through different parts of our model. For example, if a mobile agent observe an information piece
+such as obstacles, then the agent should infer the certainty of its location based on new observation. Of course, the robot will never know exactly its position, it just gradually increases confidences of the position.</p>
+
+<p align="center">
+  <img src="/anindex.github.io/assets/img/uncertainty.jpg" alt="drawing" width="400" height="400">
+  source. credit: https://www.facebook.com/pedromics
+</p>
+
+<p>Some uncertainties we are aware of, however, some are not. When designing models to understand, predict or make decision about a subject in nature, we may not
+observe enough due to incapability of instruments or unexpected field of data, the model may end up
+imperfect to account for unknown uncertainties. The data of subject’s behavior, that we cannot capture
+during model development, may also be unobserved not only because of low entropy distribution of behavior
+(rare behavior) in some situations, but also the infinity of data field. Moreover, there are also subjects that
+cannot be fully observed as a whole, and hence cannot be modeled completely. For instance, the
+Complementarity principle states that a complete knowledge of phenomena on atomic dimensions requires
+a description of both wave and particle properties, if we unfortunately do not observe other property in different strategies of
+experiment, our model may be incomplete. It is not professional to say we do science with lucks, but in
+reality these circumstances can happen because of uncertainty. Therefore, science requires patience and tenacity in order to observe "enough" population of studied subject.</p>
+
+<h3>Uncertainty is opportunity to learn more.</h3>
+
+<p>As the opening sentence "the only certainty is the uncertainty", I would like to ask a question that I
+have always regarded whenever I learn new mathematical physic concepts:</p>
+
+> How do we react if a physic law does not predict correct behavior of a subject? Could we tolerate physic law
+to have efficiency?
+
+<p>Efficiency here means the frequentist-measurement of how many time the physic law holds true in total of
+repeated experiment, in the same environmental setting. If a physic law (for instance concrete physic laws
+such as thermodynamics laws) predicts incorrectly compared to measurements in an experiment, assuming
+that experiment setting is correct, do we still tolerate the physic law to have very rare change of failure?. As scientists, we discard the law to prevent further error propagation to
+subsequent theories developed based on the physic law, and question that the law fails because of imperfect
+physic model (source of unknown unknowns) or the incapability of model different characteristic of the
+subject at different scale of space and time?. As engineers, we tend to accept the uncertainty to an extent, if
+it does not affect too much to the stability and correctness of the system we built. No one could really expect where uncertaities are lurking. Then again, we tolerate uncertaity depending on task importance. </p>
+
+<p>So we, human in general, must begin by being
+uncertain as to what the answer is, otherwise we learn not thing more if the answer is certain. As we learn,
+we do not seek for the absolute truth or falsity, we seek for the likelihood of facts being right or wrong. However, human tend to see what they want to see, thus when doing science we must be careful of bias in gathering data of studied subject.
+Otherwise, we will develop false model based on the bias.
+ In my sense, not knowing is much more interesting than having incorrect answers. We must learn to live with
+doubt and embrace uncertainty. Human ourselves are uncertainties, the degree of uncertainties in human is
+unmeasurable and hence the sciences about human cannot be laws that are proven by repeated experiments.
+However, from history experiences, we should have certainty, or so-called truth, in our relationship for the
+greater good in community. </p>
+
+
+  </article>
+
+
+
+</div>
+
+      </div>
+    </div>
+
+    <footer>
+
+  <div class="wrapper">
+    &copy; Copyright 2018 An T. Le.
+    Powered by <a href="http://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
+
+
+  </div>
+
+</footer>
+
+
+    <!-- Load jQuery -->
+<script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<!-- Load Common JS -->
+<script src="/anindex.github.io/assets/js/common.js"></script>
+
+
+<!-- Include custom icon fonts -->
+<link rel="stylesheet" href="/anindex.github.io/assets/css/fontawesome-all.min.css">
+<link rel="stylesheet" href="/anindex.github.io/assets/css/academicons.min.css">
+
+<!-- Google Analytics -->
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-XXXXXXXXX', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+  </body>
+
+</html>
